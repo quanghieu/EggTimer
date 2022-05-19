@@ -52,13 +52,18 @@ class EggTimerFragment : Fragment() {
 
         // TODO: Step 1.7 call create channel
         createChannel(getString(R.string.egg_notification_channel_id), getString(R.string.egg_notification_channel_name))
+        createChannel(getString(R.string.breakfast_notification_channel_id), getString(R.string.breakfast_notification_channel_name))
+        subscribeTopic()
         return binding.root
     }
 
     private fun createChannel(channelId: String, channelName: String) {
         // TODO: Step 1.6 START create a channel
         val notificationChannel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+                .apply {
+                    setShowBadge(false)
+                }
         } else {
             TODO("VERSION.SDK_INT < O")
         }
@@ -74,6 +79,19 @@ class EggTimerFragment : Fragment() {
 
     companion object {
         fun newInstance() = EggTimerFragment()
+    }
+
+    private fun subscribeTopic() {
+        // [START subscribe_topics]
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+            .addOnCompleteListener { task ->
+                var msg = getString(R.string.message_subscribed)
+                if (!task.isSuccessful) {
+                    msg = getString(R.string.message_subscribe_failed)
+                }
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            }
+        // [END subscribe_topics]
     }
 }
 
